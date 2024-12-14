@@ -1,0 +1,23 @@
+# Training configuration
+training:
+  batch_size: 32
+  learning_rate: 0.001
+  max_epochs: 100
+  num_workers: 4
+  
+# Model configuration
+model:
+  name: "resnet50"
+  pretrained: true
+  num_classes: 10
+
+# Distributed training
+distributed:
+  backend: "nccl"
+  num_nodes: 1
+  gpus_per_node: 1
+  
+# Logging
+wandb:
+  project: "distributed-ml"
+  entity: "your-username"
