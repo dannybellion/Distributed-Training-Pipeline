@@ -1,5 +1,12 @@
+import torch
 from torch.utils.data import Dataset
 from transformers import AutoTokenizer
+
+def collate_fn(batch):
+    return {
+        'input_ids': torch.nn.utils.rnn.pad_sequence([item['input_ids'] for item in batch], batch_first=True),
+        'attention_mask': torch.nn.utils.rnn.pad_sequence([item['attention_mask'] for item in batch], batch_first=True, padding_value=0),
+    }
 
 class TextDataset(Dataset):
     def __init__(self, file_path, tokenizer, max_length=128):

@@ -8,14 +8,8 @@ from torch.utils.data import DataLoader
 from transformers import get_linear_schedule_with_warmup
 from tqdm.auto import tqdm
 from utils import set_seed, save_checkpoint, load_config
-from dataset import TextDataset
+from dataset import TextDataset, collate_fn
 from model import load_model_and_tokenizer
-
-def collate_fn(batch):
-    return {
-        'input_ids': torch.nn.utils.rnn.pad_sequence([item['input_ids'] for item in batch], batch_first=True),
-        'attention_mask': torch.nn.utils.rnn.pad_sequence([item['attention_mask'] for item in batch], batch_first=True, padding_value=0),
-    }
 
 def main():
     # Load config
