@@ -1,160 +1,59 @@
-# Distributed Training Pipeline for Language Models
+# Distributed Training Pipeline
 
-## Overview
-This document describes the architecture and implementation of a distributed training pipeline for large language models, emphasizing best practices in machine learning engineering and scalable system design.
+A scalable distributed training pipeline for transformer-based language models using PyTorch and Hugging Face.
 
----
+## Features
 
-## Project Context and Motivation
+- Multi-GPU training with Hugging Face Accelerate
+- Configurable hyperparameters via YAML
+- Mixed precision training support
+- Checkpoint saving and loading
+- Progress logging and validation metrics
 
-### Modern NLP Challenges
-Training large-scale transformer-based language models requires vast datasets and significant computational resources. Distributed training techniques help:
-- Manage computational demands efficiently.
-- Accelerate experimentation and iteration cycles.
-- Optimize GPU cluster utilization.
-- Facilitate rapid development of large-scale models.
+## Code Structure
 
-### Objectives
-1. **Demonstrate Distributed Training Skills:**
-   - Train a moderately sized transformer model (e.g., DistilBERT or small GPT-2) using multi-GPU setups, reflecting real-world industry practices.
-   - Showcase the ability to scale beyond single-machine training.
+### Core Components
 
-2. **Showcase Model Engineering Best Practices:**
-   - Efficient data handling.
-   - Use of robust distributed frameworks.
-   - Application of optimizations like mixed-precision training.
-   - Logging metrics, saving checkpoints, and ensuring reproducibility.
+- `src/train.py`: Main training loop with distributed training setup using Accelerate
+- `src/model.py`: Model loading utilities using Hugging Face transformers
+- `src/dataset.py`: Custom dataset class for text data with padding collation
+- `src/utils.py`: Helper functions for reproducibility and checkpointing
 
-3. **End-to-End Pipeline Creation:**
-   - **Data Preparation:** Clean, tokenize, and prepare datasets for GPU processing.
-   - **Configuration Management:** Use YAML files for hyperparameters and paths to ensure clarity and reproducibility.
-   - **Modular Code Structure:** Separate dataset logic, model loading, training routines, and utilities into clear modules.
-   - **Experiment Tracking:** Integrate tools like Weights & Biases or MLflow for metrics logging and experiment comparison.
+### Key Implementation Details
 
-4. **Reproducibility and Scalability:**
-   - Enable easy adaptation for larger models, datasets, or multi-node clusters.
-   - Encapsulate configuration and data handling for flexible experimentation.
-
----
-
-## Key Technical Concepts
-
-### 1. Transformer-Based Models
-Transformers (e.g., BERT, GPT) leverage attention mechanisms to process token sequences efficiently, enabling state-of-the-art performance in language understanding and generation.
-
-### 2. Tokenization and Preprocessing
-- Text is converted to token IDs using tools like Hugging Face's `AutoTokenizer`.
-- Preprocessing includes cleaning, normalizing, and segmenting text into fixed-length sequences suitable for GPU memory.
-
-### 3. Distributed Training and Data Parallelism
-- Distributed Data Parallel (DDP) ensures:
-  - Each GPU processes a portion of training data.
-  - Gradients synchronize across GPUs to update a shared model.
-- Libraries like Hugging Face's `accelerate` simplify distributed training setups.
-
-### 4. Mixed-Precision Training
-- Training with half-precision (float16) reduces memory usage and speeds up computations without compromising quality.
-
-### 5. Experiment Tracking and Logging
-- Tools like Weights & Biases track metrics (e.g., loss, accuracy, perplexity), enabling easy run comparisons and visualizations.
-
-### 6. Evaluation and Checkpointing
-- Periodic evaluation on a validation set prevents overfitting and guides hyperparameter tuning.
-- Checkpoints save model states, allowing training resumption and result analysis.
-
----
-
-## Why This Matters to Employers Like Anthropic
-This project demonstrates:
-- Competence in distributed training and scalable system design.
-- Advanced engineering practices required for reliable, large-scale model training.
-- A foundational skill set essential for contributing to cutting-edge AI research.
-
----
-
-## Outputs and Metrics
-
-### Primary Outputs
-1. **Model Checkpoints:**
-   - Stored at configured intervals (e.g., per epoch) in an `output/` directory.
-   - Allow for resuming training, evaluating models, or comparing runs.
-
-2. **Logged Metrics and Training Curves:**
-   - Key metrics include:
-     - **Training Loss:** Indicates model fitting during training.
-     - **Validation Loss:** Assesses generalization on held-out data.
-     - **Optional Perplexity:** For language models, lower values indicate better text prediction.
-
-3. **Performance Profiling Data (Optional):**
-   - **Training Throughput:** Samples or tokens processed per second.
-   - **Memory Usage:** GPU memory consumption.
-   - **Wall-Clock Time:** Time to complete epochs or reach loss targets.
-
----
-
-## Experiment Comparisons
-
-1. **Single-GPU vs. Multi-GPU:**
-   - Compare validation loss and training throughput.
-   - Demonstrate how distributed setups improve efficiency.
-
-2. **Hyperparameter Variations:**
-   - Assess the impact of changes in learning rate, batch size, or sequence length on validation loss or convergence speed.
-
-3. **Optimization Techniques:**
-   - Evaluate mixed-precision training's effect on speed, memory usage, and validation performance.
-
----
-
-## Summary
-This project highlights the development of a scalable, well-structured pipeline for distributed training of transformer-based models. By integrating advanced ML engineering practices, it provides a practical template for scaling up to larger models and datasets. These skills align closely with the requirements of high-impact research organizations like Anthropic, showcasing the ability to tackle real-world challenges in large-scale machine learning.
-
-
-## Setup
-
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/my-distributed-ml-project.git
-cd my-distributed-ml-project
+**Dataset Handling**
+```python
+class TextDataset:
+    # Efficient text dataset with tokenization and padding
+    # Supports both masked LM and causal LM tasks
 ```
 
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
+**Training Loop**
+```python
+def main():
+    # Distributed setup with Accelerate
+    # Gradient accumulation and mixed precision
+    # Regular validation and checkpointing
 ```
 
-3. Configure your experiment in `configs/default_config.yaml`
-
-4. Download and preprocess data:
-```bash
-cd data
-./download_data.sh  # Instructions in data/README.md
+**Model Management**
+```python
+def load_model_and_tokenizer():
+    # Flexible model loading from Hugging Face hub
+    # Supports various model architectures
 ```
 
-## Usage
+## Directory Structure
 
-### Single GPU Training
-```bash
-./scripts/run_single.sh
 ```
-
-### Distributed Training
-```bash
-./scripts/run_distributed.sh
-```
-
-## Project Structure
-```
-my-distributed-ml-project/
-├─ configs/         # Configuration files
-├─ data/           # Data handling scripts
-├─ src/            # Main source code
-├─ notebooks/      # Analysis notebooks
-└─ scripts/        # Training scripts
+.
+├── config/         # YAML configuration files
+├── data/          # Training and validation data
+├── notebooks/     # Analysis notebooks
+├── scripts/       # Training scripts
+└── src/           # Core implementation
 ```
 
 ## License
-MIT
 
-## Contributing
-Please read CONTRIBUTING.md for details on our code of conduct and the process for submitting pull requests.
+MIT
