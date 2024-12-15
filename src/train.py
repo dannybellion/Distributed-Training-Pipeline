@@ -11,12 +11,18 @@ from utils import set_seed, save_checkpoint, load_config
 from dataset import TextDataset
 from model import load_model_and_tokenizer
 
+def collate_fn(batch):
+    return {
+        'input_ids': torch.nn.utils.rnn.pad_sequence([item['input_ids'] for item in batch], batch_first=True),
+        'attention_mask': torch.nn.utils.rnn.pad_sequence([item['attention_mask'] for item in batch], batch_first=True, padding_value=0),
+    }
+
 def main():
     # Load config
-    config = load_config("configs/default_config.yaml")
+    config = load_config("config/default_config.yaml")
     set_seed(42)
 
-    accelerator = Accelerator(mixed_precision="fp16")
+    accelerator = Accelerator(mixed_precision="no")
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO if accelerator.is_local_main_process else logging.ERROR)
 
@@ -25,10 +31,10 @@ def main():
     train_dataset = TextDataset(config["train_file"], tokenizer, config["max_seq_length"])
     val_dataset = TextDataset(config["val_file"], tokenizer, config["max_seq_length"])
 
-    train_loader = DataLoader(train_dataset, batch_size=config["batch_size"], shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=config["batch_size"])
+    train_loader = DataLoader(train_dataset, batch_size=config["batch_size"], shuffle=True, collate_fn=collate_fn)
+    val_loader = DataLoader(val_dataset, batch_size=config["batch_size"], collate_fn=collate_fn)
 
-    optimizer = torch.optim.AdamW(model.parameters(), lr=config["learning_rate"])
+    optimizer = torch.optim.AdamW(model.parameters(), lr=float(config["learning_rate"]))
     total_steps = (len(train_loader) * config["num_epochs"]) // config["gradient_accumulation_steps"]
     scheduler = get_linear_schedule_with_warmup(optimizer, 
                                                 num_warmup_steps=int(0.1*total_steps), 
