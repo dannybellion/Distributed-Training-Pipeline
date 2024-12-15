@@ -1,38 +1,21 @@
-import yaml
-import logging
-import torch
 import random
 import numpy as np
-
-def load_config(config_path):
-    """Load YAML configuration file."""
-    with open(config_path, 'r') as f:
-        return yaml.safe_load(f)
-
-def setup_logging(name, log_file=None):
-    """Setup logging configuration."""
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
-    
-    formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-    
-    if log_file:
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-    
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-    
-    return logger
+import torch
+import os
+import yaml
 
 def set_seed(seed):
-    """Set random seeds for reproducibility."""
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed)
+
+def load_config(path):
+    with open(path, 'r') as f:
+        return yaml.safe_load(f)
+
+def save_checkpoint(model, tokenizer, output_dir, epoch, accelerator):
+    if accelerator.is_local_main_process:
+        os.makedirs(output_dir, exist_ok=True)
+        unwrapped_model = accelerator.unwrap_model(model)
+        unwrapped_model.save_pretrained(os.path.join(output_dir, f"epoch_{epoch}"))
+        tokenizer.save_pretrained(os.path.join(output_dir, f"epoch_{epoch}"))
